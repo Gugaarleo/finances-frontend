@@ -1,7 +1,12 @@
-FROM node:20
+FROM node:20 AS build
 WORKDIR /app
-COPY . .
+COPY package*.json ./
 RUN npm install
-RUN npm install @angular/cli -g
-EXPOSE 4200
-CMD ["ng", "serve", "--host", "0.0.0.0"]
+COPY . .
+RUN npm run build
+
+FROM nginx:1.27-alpine
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/dist/front-angular/browser/ /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

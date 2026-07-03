@@ -1,4 +1,4 @@
 export const environment = {
     production:false,
-    endPoint: 'http://localhost:8080'
+    endPoint: 'https://probable-goldfish-gw75x774gfv4wp-8080.app.github.dev'
 };

@@ -1,7 +1,31 @@
 services:
   frontend:
-    build:
-      context: ./
-      dockerfile: Dockerfile
+    image: ${FRONTEND_IMAGE:-docker.io/gugaarleo/finances-frontend:latest}
     ports:
-      - "4200:4200"
+      - "4200:80"
+    depends_on:
+      - backend
+
+  backend:
+    image: ${BACKEND_IMAGE:-docker.io/gugaarleo/finances-backend:latest}
+    environment:
+      APP_PORT: ${BACKEND_PORT:-8080}
+      DATABASE_HOST: ${DATABASE_HOST:-db}
+      DATABASE_PORT: ${DATABASE_PORT:-5432}
+      DATABASE_NAME: ${DATABASE_NAME:-finances}
+      DATABASE_USER: ${DATABASE_USER:-finances}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-finances}
+      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost:4200}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+  db:
+    image: ${DATABASE_IMAGE:-postgres:16-alpine}
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME:-finances}
+      POSTGRES_USER: ${DATABASE_USER:-finances}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-finances}
+    ports:
+      - "5432:5432"
